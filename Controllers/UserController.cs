@@ -25,7 +25,11 @@ namespace SteenBookKeepingSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser([FromBody] CreateUserDTO newUser)
         {
-            try
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+                try
             {
                 var user = await _userService.CreateUserAsync(newUser);
                 return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
@@ -49,12 +53,6 @@ namespace SteenBookKeepingSystem.Controllers
             }
 
             return user;
-        }
-
-        private string HashPassword(string password)
-        {
-            // Implement password hashing here
-            return password; // Replace this with actual hashed password
         }
     }
 }

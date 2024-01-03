@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SteenBookKeepingSystem.Database.Context;
+using SteenBookKeepingSystem.Services.Implementations;
+using SteenBookKeepingSystem.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BookKeepingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BookKeepingDatabase")));
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

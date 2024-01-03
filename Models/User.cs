@@ -31,6 +31,7 @@ namespace SteenBookKeepingSystem.Models
         [StringLength(100)]
         [Required]
         public string LastName { get; set; }
+        public List<Company> Companies { get; set; } = new List<Company>();
 
         public string CreateBy {  get; set; }
 
