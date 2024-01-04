@@ -33,19 +33,24 @@ namespace SteenBookKeepingSystem.Controllers
             {
                 var user = await _userService.CreateUserAsync(newUser);
 
-                /*
+                
                 return CreatedAtRoute(
                     routeName: "GetUserById", // The route name of the action to get the user by Id
                     routeValues: new { id = user.Id }, // The route value, typically the new user's Id
                     value: user); // The created user object
-                */
-                return Ok(user);
             }
             catch (ArgumentNullException)
             {
                 return BadRequest("User data is required");
             }
             // Catch other types of exceptions as needed
+        }
+
+        [HttpGet("{id}", Name = "GetUserById")]
+        public async Task<ActionResult<UserDTO>> GetUserById(string id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            return Ok(user);
         }
     }
 }

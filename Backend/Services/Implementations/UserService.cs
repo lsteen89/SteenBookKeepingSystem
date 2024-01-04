@@ -19,31 +19,59 @@ namespace SteenBookKeepingSystem.Services.Implementations
             _context = context;
             _userManager = userManager;
         }
-
-
-        public async Task<ApplicationUser> CreateUserAsync(CreateUserDTO newUser)
+        public async Task<UserDTO> CreateUserAsync(CreateUserDTO newUser)
         {
             if (newUser == null)
                 throw new ArgumentNullException(nameof(newUser));
 
             var user = new ApplicationUser
             {
-                UserName = newUser.Email, 
+                UserName = newUser.Email,
                 Email = newUser.Email,
-                DateOfBirth = newUser.DateOfBirth,
                 FirstName = newUser.FirstName,
                 LastName = newUser.LastName,
-                // Additional properties
             };
 
             var result = await _userManager.CreateAsync(user, newUser.Password);
             if (!result.Succeeded)
             {
-                // Handle the case where user creation fails
-                throw new InvalidOperationException("User creation failed.");
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"User creation failed: {errors}");
             }
 
-            return user;
+            // Convert ApplicationUser to UserDTO for the response
+            var userDto = new UserDTO
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Username = user.UserName,
+            };
+
+            return userDto;
         }
+
+
+        public async Task<UserDTO> GetUserByIdAsync(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserDTO
+            {
+                Id = id,
+                Username = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+            };
+        }
+
+
     }
 }
