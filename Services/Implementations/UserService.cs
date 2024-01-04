@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using SteenBookKeepingSystem.Database.Context;
 using SteenBookKeepingSystem.DTO;
@@ -20,14 +21,21 @@ namespace SteenBookKeepingSystem.Services.Implementations
         {
             if (newUser == null)
                 throw new ArgumentNullException(nameof(newUser));
+            
 
             string username = await CreateUsername(newUser.FirstName, newUser.LastName);
+
             var user = new User
             {
                 Username = username,
                 Email = newUser.Email,
                 Password = HashPassword(newUser.Password),
-                // Set other fields
+                DateOfBirth = newUser.DateOfBirth,
+                FirstName = newUser.FirstName,
+                LastName = newUser.LastName,
+                CreateBy = "System",
+                CreatedAt = DateTime.UtcNow,
+                LastUpdatedAt = null
             };
 
             await _context.Users.AddAsync(user);
@@ -54,7 +62,13 @@ namespace SteenBookKeepingSystem.Services.Implementations
             }
             else
             {
-                string baseUsername = (firstName.Substring(0, 2) + firstName.Substring(0, 2)).ToLower().Trim();
+                string baseUsername = (firstName.Substring(0, 2) + lastName.Substring(0, 2))
+                    .ToLower()
+                    .Trim()
+                    .Replace("å", "a")
+                    .Replace("ä", "a")
+                    .Replace("ö", "o");
+
                 string username = baseUsername;
                 int counter = 1;
 
