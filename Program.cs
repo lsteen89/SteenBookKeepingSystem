@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SteenBookKeepingSystem.Database.Context;
 using SteenBookKeepingSystem.Services.Implementations;
 using SteenBookKeepingSystem.Services.Interfaces;
@@ -11,8 +13,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BookKeepingContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BookKeepingDatabase")));
+   options.UseSqlServer(builder.Configuration.GetConnectionString("BookKeepingDatabase")));
 builder.Services.AddScoped<IUserService, UserService>();
+
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<BookKeepingContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 

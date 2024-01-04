@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using SteenBookKeepingSystem.Database.Context;
@@ -11,77 +12,38 @@ namespace SteenBookKeepingSystem.Services.Implementations
     public class UserService : IUserService
     {
         private readonly BookKeepingContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserService(BookKeepingContext context)
+        public UserService(BookKeepingContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        public async Task<User> CreateUserAsync(CreateUserDTO newUser)
+
+        public async Task<ApplicationUser> CreateUserAsync(CreateUserDTO newUser)
         {
             if (newUser == null)
                 throw new ArgumentNullException(nameof(newUser));
-            
 
-            string username = await CreateUsername(newUser.FirstName, newUser.LastName);
-
-            var user = new User
+            var user = new ApplicationUser
             {
-                Username = username,
+                UserName = newUser.Email, 
                 Email = newUser.Email,
-                Password = HashPassword(newUser.Password),
                 DateOfBirth = newUser.DateOfBirth,
                 FirstName = newUser.FirstName,
                 LastName = newUser.LastName,
-                CreateBy = "System",
-                CreatedAt = DateTime.UtcNow,
-                LastUpdatedAt = null
+                // Additional properties
             };
 
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            var result = await _userManager.CreateAsync(user, newUser.Password);
+            if (!result.Succeeded)
+            {
+                // Handle the case where user creation fails
+                throw new InvalidOperationException("User creation failed.");
+            }
 
             return user;
         }
-
-        private string HashPassword(string password)
-        {
-            // Implement password hashing here
-            return password; // Replace with actual hashed password
-        }
-        private async Task<string> CreateUsername(string firstName, string lastName)
-        {
-            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
-            {
-                throw new ArgumentException("Förnamn och/eller efternamn kan inte vara blankt.");
-            }
-
-            if (firstName.Length < 2 || lastName.Length < 2)
-            {
-                throw new ArgumentException("Förnamn och/eller efternamn måste vara minst två tecken långa.");
-            }
-            else
-            {
-                string baseUsername = (firstName.Substring(0, 2) + lastName.Substring(0, 2))
-                    .ToLower()
-                    .Trim()
-                    .Replace("å", "a")
-                    .Replace("ä", "a")
-                    .Replace("ö", "o");
-
-                string username = baseUsername;
-                int counter = 1;
-
-                while (await _context.Users.AnyAsync(u => u.Username == username))
-                {
-                    // If the username exists, append a number and check again
-                    username = baseUsername + counter.ToString();
-                    counter++;
-                }
-                return username;
-            }
-        }
-
     }
-
 }

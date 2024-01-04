@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SteenBookKeepingSystem.Database.Context;
 
@@ -11,9 +12,11 @@ using SteenBookKeepingSystem.Database.Context;
 namespace SteenBookKeepingSystem.Migrations
 {
     [DbContext(typeof(BookKeepingContext))]
-    partial class BookKeepingContextModelSnapshot : ModelSnapshot
+    [Migration("20240104142758_UpdateForApplicationUser")]
+    partial class UpdateForApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

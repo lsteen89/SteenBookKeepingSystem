@@ -5,6 +5,6 @@ namespace SteenBookKeepingSystem.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<User> CreateUserAsync(CreateUserDTO newUser);
+        Task<ApplicationUser> CreateUserAsync(CreateUserDTO newUser);
     }
 }

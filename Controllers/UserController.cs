@@ -23,7 +23,7 @@ namespace SteenBookKeepingSystem.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser([FromBody] CreateUserDTO newUser)
+        public async Task<ActionResult<ApplicationUser>> CreateUser([FromBody] CreateUserDTO newUser)
         {
             if (!ModelState.IsValid)
             {
@@ -32,27 +32,20 @@ namespace SteenBookKeepingSystem.Controllers
                 try
             {
                 var user = await _userService.CreateUserAsync(newUser);
-                return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
+
+                /*
+                return CreatedAtRoute(
+                    routeName: "GetUserById", // The route name of the action to get the user by Id
+                    routeValues: new { id = user.Id }, // The route value, typically the new user's Id
+                    value: user); // The created user object
+                */
+                return Ok(user);
             }
             catch (ArgumentNullException)
             {
                 return BadRequest("User data is required");
             }
             // Catch other types of exceptions as needed
-        }
-
-        // Method for getting a user by ID (for the CreatedAtAction)
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUserById(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
         }
     }
 }
